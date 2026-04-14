@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CAR TRACKER">
+<meta name="theme-color" content="#0d0d0d">
+<title>CAR TRACKER</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d; --bg2: #141414; --bg3: #1c1c1c;
+    --border: #2a2a2a; --accent: #e87c2a; --accent2: #f0a040;
+    --text: #e8e8e8; --muted: #666;
+    --green: #3dba6e; --yellow: #e8b830; --red: #e83a3a;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-body: 'Barlow', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+
+  /* HEADER */
+  header { background: var(--bg2); border-bottom: 2px solid var(--accent); padding: 14px 16px 10px; position: sticky; top: 0; z-index: 100; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; }
+  .app-title { font-family: var(--font-head); font-size: 26px; font-weight: 700; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
+  .app-title span { color: var(--text); font-weight: 300; }
+  .header-icons { display: flex; gap: 10px; }
+  .icon-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 6px; cursor: pointer; font-size: 17px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .icon-btn:hover, .icon-btn:active { border-color: var(--accent); color: var(--accent); }
+
+  /* NAV */
+  nav { display: flex; background: var(--bg2); border-bottom: 1px solid var(--border); }
+  .tab { flex: 1; padding: 10px 4px; text-align: center; font-family: var(--font-head); font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  main { padding: 16px; max-width: 480px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* VEHICLE BAR */
+  .vehicle-bar { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+  .vehicle-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-family: var(--font-head); font-size: 13px; font-weight: 600; letter-spacing: 1px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all .2s; flex-shrink: 0; }
+  .vehicle-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* SUMMARY */
+  .summary-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .summary-box { flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .summary-box .num { font-family: var(--font-mono); font-size: 24px; line-height: 1; }
+  .summary-box .lbl { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+  .summary-box.red .num { color: var(--red); }
+  .summary-box.yellow .num { color: var(--yellow); }
+  .summary-box.green .num { color: var(--green); }
+
+  /* CARDS */
+  .deadline-grid { display: flex; flex-direction: column; gap: 10px; }
+  .deadline-card { background: var(--bg2); border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 8px; padding: 14px 14px 12px; cursor: pointer; transition: all .2s; animation: fadeIn .3s ease; }
+  .deadline-card:active { transform: scale(0.98); }
+  .deadline-card.green { border-left-color: var(--green); }
+  .deadline-card.yellow { border-left-color: var(--yellow); }
+  .deadline-card.red { border-left-color: var(--red); }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .card-type { font-family: var(--font-head); font-size: 18px; font-weight: 700; letter-spacing: 1px; }
+  .rag-badge { font-family: var(--font-mono); font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 1px; }
+  .rag-badge.green { background: #1a3a26; color: var(--green); }
+  .rag-badge.yellow { background: #3a2e10; color: var(--yellow); }
+  .rag-badge.red { background: #3a1010; color: var(--red); }
+  .card-date { font-family: var(--font-mono); font-size: 20px; color: var(--accent2); margin: 6px 0 4px; letter-spacing: 1px; }
+  .card-bottom { display: flex; justify-content: space-between; align-items: center; }
+  .card-days { font-size: 13px; color: var(--muted); }
+  .card-note { font-size: 12px; color: var(--muted); font-style: italic; max-width: 55%; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* OVERLAY / MODAL */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: flex-end; justify-content: center; }
+  .overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: 16px 16px 0 0; padding: 20px 16px 36px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; animation: slideUp .25s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--accent); margin-bottom: 18px; text-transform: uppercase; }
+
+  /* FORM */
+  .form-group { margin-bottom: 14px; }
+  label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-family: var(--font-head); }
+  input, select, textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font-body); font-size: 15px; padding: 10px 12px; outline: none; transition: border-color .2s; -webkit-appearance: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: none; height: 70px; }
+  select option { background: var(--bg3); }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-group { flex: 1; }
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .btn { flex: 1; padding: 13px; border-radius: 8px; font-family: var(--font-head); font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border: none; transition: all .2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:active { background: var(--accent2); }
+  .btn-secondary { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+  .btn-danger { background: #3a1010; color: var(--red); border: 1px solid var(--red); }
+
+  /* STORICO */
+  .history-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; animation: fadeIn .3s ease; }
+  .history-left .h-type { font-family: var(--font-head); font-size: 15px; font-weight: 600; }
+  .history-left .h-vehicle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .history-right { text-align: right; }
+  .history-right .h-date { font-family: var(--font-mono); font-size: 13px; color: var(--accent2); }
+  .history-right .h-cost { font-size: 12px; color: var(--green); margin-top: 2px; }
+
+  /* SETTINGS */
+  .settings-section { margin-bottom: 20px; }
+  .settings-title { font-family: var(--font-head); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .s-label { font-size: 14px; }
+  .settings-row .s-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .version-tag { text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-top: 30px; letter-spacing: 2px; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-text { font-family: var(--font-head); font-size: 16px; letter-spacing: 2px; }
+
+  /* LOADER */
+  .loader { text-align: center; padding: 40px; color: var(--muted); font-family: var(--font-mono); font-size: 13px; letter-spacing: 2px; }
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--accent); color: #fff; font-family: var(--font-head); font-size: 14px; letter-spacing: 1px; padding: 10px 22px; border-radius: 30px; z-index: 999; transition: transform .3s ease; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* FAB */
+  .fab { position: fixed; bottom: 24px; right: 20px; width: 54px; height: 54px; background: var(--accent); border-radius: 50%; border: none; color: #fff; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(232,124,42,0.4); transition: all .2s; z-index: 50; }
+  .fab:active { transform: scale(0.92); }
+  .fab.hidden { display: none; }
+
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.5); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="app-title">CAR <span>TRACKER</span></div>
+    <div class="header-icons">
+      <button class="icon-btn" onclick="refreshAll()" title="Aggiorna">🔄</button>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="switchTab('dashboard')">🏠 Dashboard</div>
+  <div class="tab" onclick="switchTab('storico')">📋 Storico</div>
+  <div class="tab" onclick="switchTab('impostazioni')">⚙️ Config</div>
+</nav>
+
+<main>
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="section active">
+    <div class="vehicle-bar" id="vehicleBar"></div>
+    <div class="summary-row" id="summaryRow"></div>
+    <div id="deadlineGrid"></div>
+  </div>
+
+  <!-- STORICO -->
+  <div id="tab-storico" class="section">
+    <div id="historicoList"></div>
+  </div>
+
+  <!-- IMPOSTAZIONI -->
+  <div id="tab-impostazioni" class="section">
+    <div class="settings-section">
+      <div class="settings-title">Veicoli</div>
+      <div id="vehicleList"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="openVehicleModal()">+ AGGIUNGI VEICOLO</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">Avvisi</div>
+      <div class="settings-row">
+        <div><div class="s-label">Soglia GIALLO (giorni)</div><div class="s-sub">Scadenza entro questi giorni</div></div>
+        <input type="number" id="thresholdYellow" style="width:70px;text-align:center" value="60" onchange="saveSettings()">
+      </div>
+      <div class="settings-row">
+        <div><div class="s-label">Soglia ROSSO (giorni)</div><div class="s-sub">Scadenza entro questi giorni</div></div>
+        <input type="number" id="thresholdRed" style="width:70px;text-align:center" value="30" onchange="saveSettings()">
+      </div>
+    </div>
+    <div class="version-tag">CAR TRACKER v2.0 — AIRTABLE BACKEND</div>
+  </div>
+</main>
+
+<button class="fab" id="fab" onclick="openDeadlineModal()">＋</button>
+
+<!-- MODAL SCADENZA -->
+<div class="overlay" id="overlayDeadline">
+  <div class="modal">
+    <div class="modal-title" id="deadlineModalTitle">NUOVA SCADENZA</div>
+    <input type="hidden" id="editDeadlineId">
+    <div class="form-group">
+      <label>Tipo Scadenza</label>
+      <select id="deadlineType" onchange="toggleTipoCustom()">
+        <option value="Bollo">🟦 Bollo</option>
+        <option value="Assicurazione">🛡️ Assicurazione</option>
+        <option value="Revisione">🔧 Revisione</option>
+        <option value="Tagliando">🔩 Tagliando</option>
+        <option value="Patente">📄 Patente</option>
+        <option value="Gomme">🔄 Gomme</option>
+        <option value="Altro">📌 Altro</option>
+      </select>
+    </div>
+    <div id="tipoPersonalizzatoGroup" class="form-group" style="display:none">
+      <label>Descrizione personalizzata</label>
+      <input type="text" id="tipoPersonalizzato" placeholder="es. Estintore, Vignetta...">
+    </div>
+    <div class="form-group">
+      <label>Veicolo</label>
+      <select id="deadlineVehicle"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data Scadenza</label>
+        <input type="date" id="deadlineDate">
+      </div>
+      <div class="form-group">
+        <label>Costo (€)</label>
+        <input type="number" id="deadlineCost" placeholder="0.00" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Note</label>
+      <textarea id="deadlineNote" placeholder="Note opzionali..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeDeadlineModal()">ANNULLA</button>
+      <button class="btn btn-danger" id="btnDeleteDeadline" style="display:none" onclick="deleteDeadline()">ARCHIVIA</button>
+      <button class="btn btn-primary" onclick="saveDeadline()">SALVA</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VEICOLO -->
+<div class="overlay" id="overlayVehicle">
+  <div class="modal">
+    <div class="modal-title" id="vehicleModalTitle">NUOVO VEICOLO</div>
+    <input type="hidden" id="editVehicleId">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome / Soprannome</label>
+        <input type="text" id="vehicleName" placeholder="es. Punto, Panda...">
+      </div>
+      <div class="form-group">
+        <label>Targa</label>
+        <input type="text" id="vehiclePlate" placeholder="AB123CD" style="text-transform:uppercase">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Marca</label>
+        <input type="text" id="vehicleBrand" placeholder="es. Fiat">
+      </div>
+      <div class="form-group">
+        <label>Modello</label>
+        <input type="text" id="vehicleModel" placeholder="es. 500">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Anno</label>
+      <input type="number" id="vehicleYear" placeholder="es. 2018" min="1970" max="2030">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeVehicleModal()">ANNULLA</button>
+      <button class="btn btn-danger" id="btnDeleteVehicle" style="display:none" onclick="deleteVehicle()">ELIMINA</button>
+      <button class="btn btn-primary" onclick="saveVehicle()">SALVA</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG AIRTABLE ──────────────────────────────────────
+const BASE_ID = 'appuUfADrQRoHt9Ca';
+const TOKEN   = 'patEUroqNu9OpwF9M.634307ca10cf8bdfb0621eb6792a2f5d8407c0a8af712192108e9884f486125e';
+const API     = `https://api.airtable.com/v0/${BASE_ID}`;
+const HEADERS = { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' };
+
+// ─── LOCAL STATE (cache) ──────────────────────────────────
+let vehicles  = [];
+let deadlines = [];
+let history   = [];
+let settings  = { thresholdYellow: 60, thresholdRed: 30 };
+let selectedVehicleId = null;
+
+// ─── AIRTABLE API ─────────────────────────────────────────
+async function atFetch(table, params = '') {
+  let records = [], offset = null;
+  do {
+    const url = `${API}/${encodeURIComponent(table)}?pageSize=100${offset ? '&offset='+offset : ''}${params}`;
+    const r = await fetch(url, { headers: HEADERS });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    records = records.concat(d.records || []);
+    offset = d.offset || null;
+  } while (offset);
+  return records;
+}
+
+async function atCreate(table, fields) {
+  const r = await fetch(`${API}/${encodeURIComponent(table)}`, {
+    method: 'POST', headers: HEADERS,
+    body: JSON.stringify({ fields })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  return d;
+}
+
+async function atUpdate(table, id, fields) {
+  const r = await fetch(`${API}/${encodeURIComponent(table)}/${id}`, {
+    method: 'PATCH', headers: HEADERS,
+    body: JSON.stringify({ fields })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  return d;
+}
+
+async function atDelete(table, id) {
+  const r = await fetch(`${API}/${encodeURIComponent(table)}/${id}`, {
+    method: 'DELETE', headers: HEADERS
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  return d;
+}
+
+// ─── LOAD ALL DATA ────────────────────────────────────────
+async function loadAll() {
+  showLoader('deadlineGrid');
+  try {
+    const [vRecs, dRecs, hRecs] = await Promise.all([
+      atFetch('Veicoli'),
+      atFetch('Scadenze'),
+      atFetch('Storico')
+    ]);
+
+    vehicles = vRecs.map(r => ({
+      id: r.id,
+      name:  r.fields['Nome']    || '',
+      plate: r.fields['Targa']   || '',
+      brand: r.fields['Marca']   || '',
+      model: r.fields['Modello'] || '',
+      year:  r.fields['Anno']    || ''
+    }));
+
+    deadlines = dRecs.map(r => ({
+      id:         r.id,
+      type:       r.fields['Tipo']       || '',
+      tipoCustom: r.fields['TipoCustom'] || '',
+      vehicleId:  r.fields['Veicolo']    ? r.fields['Veicolo'][0] : null,
+      date:       r.fields['Data']       || '',
+      cost:       r.fields['Costo']      || '',
+      note:       r.fields['Note']       || ''
+    }));
+
+    history = hRecs.map(r => ({
+      id:          r.id,
+      type:        r.fields['Tipo']        || '',
+      tipoCustom:  r.fields['TipoCustom']  || '',
+      vehicleId:   r.fields['Veicolo']     ? r.fields['Veicolo'][0] : null,
+      date:        r.fields['Data']        || '',
+      cost:        r.fields['Costo']       || '',
+      note:        r.fields['Note']        || '',
+      archivedAt:  r.fields['ArchivitoIl'] || ''
+    }));
+
+    renderDashboard();
+  } catch(e) {
+    document.getElementById('deadlineGrid').innerHTML =
+      `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">ERRORE CONNESSIONE</div><div style="font-size:12px;margin-top:8px;color:var(--muted)">${e.message}</div></div>`;
+  }
+}
+
+function showLoader(containerId) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = `<div class="loader"><div class="spinner"></div>CARICAMENTO...</div>`;
+}
+
+async function refreshAll() {
+  showToast('Aggiornamento...');
+  await loadAll();
+  if (document.getElementById('tab-storico').classList.contains('active')) renderStorico();
+  if (document.getElementById('tab-impostazioni').classList.contains('active')) renderImpostazioni();
+}
+
+// ─── UTILS ────────────────────────────────────────────────
+function daysUntil(dateStr) {
+  if (!dateStr) return 9999;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
+
+function ragClass(days) {
+  const y = parseInt(settings.thresholdYellow);
+  const r = parseInt(settings.thresholdRed);
+  if (days < 0) return 'red';
+  if (days <= r) return 'red';
+  if (days <= y) return 'yellow';
+  return 'green';
+}
+
+function ragLabel(days) {
+  if (days < 0) return 'SCADUTA';
+  if (ragClass(days) === 'red') return 'URGENTE';
+  if (ragClass(days) === 'yellow') return 'IN SCADENZA';
+  return 'OK';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const [y,m,d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function typeName(d) {
+  return (d.type === 'Altro' && d.tipoCustom) ? d.tipoCustom : d.type;
+}
+
+function vehicleName(id) {
+  const v = vehicles.find(x => x.id === id);
+  if (!v) return '—';
+  return v.name + (v.plate ? ' · ' + v.plate.toUpperCase() : '');
+}
+
+// ─── TABS ─────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const tabs = ['dashboard','storico','impostazioni'];
+  document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('fab').classList.toggle('hidden', tab !== 'dashboard');
+  if (tab === 'storico') renderStorico();
+  if (tab === 'impostazioni') renderImpostazioni();
+  if (tab === 'dashboard') renderDashboard();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────
+function renderDashboard() {
+  const bar = document.getElementById('vehicleBar');
+  bar.innerHTML = '';
+
+  if (vehicles.length === 0) {
+    document.getElementById('summaryRow').innerHTML = '';
+    document.getElementById('deadlineGrid').innerHTML =
+      `<div class="empty"><div class="empty-icon">🚗</div><div class="empty-text">NESSUN VEICOLO</div><div style="font-size:13px;margin-top:8px;color:var(--muted)">Vai in Config e aggiungi un veicolo</div></div>`;
+    return;
+  }
+
+  // "Tutti" chip
+  const all = document.createElement('div');
+  all.className = 'vehicle-chip' + (selectedVehicleId === null ? ' active' : '');
+  all.textContent = 'Tutti';
+  all.onclick = () => { selectedVehicleId = null; renderDashboard(); };
+  bar.appendChild(all);
+
+  vehicles.forEach(v => {
+    const chip = document.createElement('div');
+    chip.className = 'vehicle-chip' + (selectedVehicleId === v.id ? ' active' : '');
+    chip.textContent = v.name + (v.plate ? ' · ' + v.plate.toUpperCase() : '');
+    chip.onclick = () => { selectedVehicleId = v.id; renderDashboard(); };
+    bar.appendChild(chip);
+  });
+
+  const filtered = deadlines.filter(d => selectedVehicleId === null || d.vehicleId === selectedVehicleId);
+  let red=0, yellow=0, green=0;
+  filtered.forEach(d => {
+    const c = ragClass(daysUntil(d.date));
+    if (c === 'red') red++;
+    else if (c === 'yellow') yellow++;
+    else green++;
+  });
+
+  document.getElementById('summaryRow').innerHTML = `
+    <div class="summary-box red"><div class="num">${red}</div><div class="lbl">Urgenti</div></div>
+    <div class="summary-box yellow"><div class="num">${yellow}</div><div class="lbl">In Scadenza</div></div>
+    <div class="summary-box green"><div class="num">${green}</div><div class="lbl">OK</div></div>
+  `;
+
+  const sorted = [...filtered].sort((a,b) => a.date.localeCompare(b.date));
+  const grid = document.getElementById('deadlineGrid');
+  if (sorted.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-text">NESSUNA SCADENZA</div><div style="font-size:13px;margin-top:8px;color:var(--muted)">Aggiungi una scadenza con +</div></div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  sorted.forEach(d => {
+    const days = daysUntil(d.date);
+    const rc = ragClass(days);
+    const rl = ragLabel(days);
+    const daysText = days < 0 ? `Scaduta da ${Math.abs(days)} giorni` : days === 0 ? 'Scade OGGI' : `Tra ${days} giorni`;
+    const card = document.createElement('div');
+    card.className = `deadline-card ${rc}`;
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="card-type">${typeName(d)}</div>
+        <span class="rag-badge ${rc}">${rl}</span>
+      </div>
+      <div class="card-date">${formatDate(d.date)}</div>
+      <div class="card-bottom">
+        <div class="card-days">${vehicleName(d.vehicleId)}<br><span style="color:var(--accent2)">${daysText}</span></div>
+        <div class="card-note">${d.note || ''}</div>
+      </div>
+    `;
+    card.onclick = () => openDeadlineModal(d.id);
+    grid.appendChild(card);
+  });
+}
+
+// ─── STORICO ─────────────────────────────────────────────
+function renderStorico() {
+  const list = document.getElementById('historicoList');
+  const sorted = [...history].sort((a,b) => b.date.localeCompare(a.date));
+  if (sorted.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">NESSUNO STORICO</div></div>`;
+    return;
+  }
+  list.innerHTML = sorted.map(h => `
+    <div class="history-item">
+      <div class="history-left">
+        <div class="h-type">${typeName(h)}</div>
+        <div class="h-vehicle">${vehicleName(h.vehicleId)}</div>
+        ${h.note ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">${h.note}</div>` : ''}
+      </div>
+      <div class="history-right">
+        <div class="h-date">${formatDate(h.date)}</div>
+        ${h.cost ? `<div class="h-cost">€ ${parseFloat(h.cost).toFixed(2)}</div>` : ''}
+        ${h.archivedAt ? `<div style="font-size:10px;color:var(--muted)">archiviato ${formatDate(h.archivedAt)}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── IMPOSTAZIONI ─────────────────────────────────────────
+function renderImpostazioni() {
+  document.getElementById('thresholdYellow').value = settings.thresholdYellow;
+  document.getElementById('thresholdRed').value = settings.thresholdRed;
+  const vlist = document.getElementById('vehicleList');
+  if (vehicles.length === 0) {
+    vlist.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">Nessun veicolo registrato.</div>';
+    return;
+  }
+  vlist.innerHTML = vehicles.map(v => `
+    <div class="settings-row" onclick="openVehicleModal('${v.id}')" style="cursor:pointer">
+      <div>
+        <div class="s-label">${v.name} ${v.plate ? '· ' + v.plate.toUpperCase() : ''}</div>
+        <div class="s-sub">${[v.brand, v.model, v.year].filter(Boolean).join(' ')}</div>
+      </div>
+      <span style="color:var(--accent);font-size:18px">›</span>
+    </div>
+  `).join('');
+}
+
+function saveSettings() {
+  settings.thresholdYellow = parseInt(document.getElementById('thresholdYellow').value) || 60;
+  settings.thresholdRed    = parseInt(document.getElementById('thresholdRed').value)    || 30;
+  localStorage.setItem('ct_settings', JSON.stringify(settings));
+}
+
+// ─── VEHICLE MODAL ────────────────────────────────────────
+function openVehicleModal(id) {
+  document.getElementById('vehicleModalTitle').textContent = id ? 'MODIFICA VEICOLO' : 'NUOVO VEICOLO';
+  document.getElementById('editVehicleId').value = id || '';
+  document.getElementById('btnDeleteVehicle').style.display = id ? 'block' : 'none';
+  const v = id ? vehicles.find(x => x.id === id) : null;
+  document.getElementById('vehicleName').value  = v ? v.name  : '';
+  document.getElementById('vehiclePlate').value = v ? v.plate : '';
+  document.getElementById('vehicleBrand').value = v ? v.brand : '';
+  document.getElementById('vehicleModel').value = v ? v.model : '';
+  document.getElementById('vehicleYear').value  = v ? v.year  : '';
+  document.getElementById('overlayVehicle').classList.add('open');
+}
+function closeVehicleModal() { document.getElementById('overlayVehicle').classList.remove('open'); }
+
+async function saveVehicle() {
+  const name = document.getElementById('vehicleName').value.trim();
+  if (!name) { showToast('Inserisci un nome!'); return; }
+  const id = document.getElementById('editVehicleId').value;
+  const fields = {
+    'Nome':    name,
+    'Targa':   document.getElementById('vehiclePlate').value.trim().toUpperCase(),
+    'Marca':   document.getElementById('vehicleBrand').value.trim(),
+    'Modello': document.getElementById('vehicleModel').value.trim(),
+    'Anno':    parseInt(document.getElementById('vehicleYear').value) || null
+  };
+  showToast('Salvataggio...', 5000);
+  try {
+    if (id) {
+      await atUpdate('Veicoli', id, fields);
+      showToast('Veicolo aggiornato ✓');
+    } else {
+      await atCreate('Veicoli', fields);
+      showToast('Veicolo aggiunto ✓');
+    }
+    closeVehicleModal();
+    await loadAll();
+    renderImpostazioni();
+  } catch(e) { showToast('Errore: ' + e.message); }
+}
+
+async function deleteVehicle() {
+  const id = document.getElementById('editVehicleId').value;
+  if (!confirm('Eliminare questo veicolo? Le scadenze collegate rimarranno su Airtable.')) return;
+  try {
+    await atDelete('Veicoli', id);
+    showToast('Veicolo eliminato ✓');
+    if (selectedVehicleId === id) selectedVehicleId = null;
+    closeVehicleModal();
+    await loadAll();
+    renderImpostazioni();
+  } catch(e) { showToast('Errore: ' + e.message); }
+}
+
+// ─── DEADLINE MODAL ───────────────────────────────────────
+function openDeadlineModal(id) {
+  const sel = document.getElementById('deadlineVehicle');
+  sel.innerHTML = vehicles.map(v => `<option value="${v.id}">${v.name}${v.plate ? ' · '+v.plate.toUpperCase():''}</option>`).join('');
+
+  document.getElementById('editDeadlineId').value = id || '';
+  document.getElementById('deadlineModalTitle').textContent = id ? 'MODIFICA SCADENZA' : 'NUOVA SCADENZA';
+  document.getElementById('btnDeleteDeadline').style.display = id ? 'block' : 'none';
+
+  const d = id ? deadlines.find(x => x.id === id) : null;
+  document.getElementById('deadlineType').value       = d ? d.type : 'Bollo';
+  document.getElementById('tipoPersonalizzato').value = d && d.tipoCustom ? d.tipoCustom : '';
+  toggleTipoCustom();
+  document.getElementById('deadlineDate').value  = d ? d.date : '';
+  document.getElementById('deadlineCost').value  = d ? (d.cost || '') : '';
+  document.getElementById('deadlineNote').value  = d ? (d.note || '') : '';
+  if (d && d.vehicleId) sel.value = d.vehicleId;
+  else if (selectedVehicleId) sel.value = selectedVehicleId;
+
+  document.getElementById('overlayDeadline').classList.add('open');
+}
+function closeDeadlineModal() { document.getElementById('overlayDeadline').classList.remove('open'); }
+
+function toggleTipoCustom() {
+  const tipo = document.getElementById('deadlineType').value;
+  document.getElementById('tipoPersonalizzatoGroup').style.display = tipo === 'Altro' ? 'block' : 'none';
+}
+
+async function saveDeadline() {
+  const date      = document.getElementById('deadlineDate').value;
+  const vehicleId = document.getElementById('deadlineVehicle').value;
+  if (!date)      { showToast('Inserisci la data!');      return; }
+  if (!vehicleId) { showToast('Seleziona un veicolo!');   return; }
+
+  const id   = document.getElementById('editDeadlineId').value;
+  const tipo = document.getElementById('deadlineType').value;
+  const fields = {
+    'Tipo':       tipo,
+    'TipoCustom': tipo === 'Altro' ? document.getElementById('tipoPersonalizzato').value.trim() : '',
+    'Veicolo':    [vehicleId],
+    'Data':       date,
+    'Costo':      parseFloat(document.getElementById('deadlineCost').value) || null,
+    'Note':       document.getElementById('deadlineNote').value.trim()
+  };
+
+  showToast('Salvataggio...', 5000);
+  try {
+    if (id) {
+      await atUpdate('Scadenze', id, fields);
+      showToast('Scadenza aggiornata ✓');
+    } else {
+      await atCreate('Scadenze', fields);
+      showToast('Scadenza aggiunta ✓');
+    }
+    closeDeadlineModal();
+    await loadAll();
+  } catch(e) { showToast('Errore: ' + e.message); }
+}
+
+async function deleteDeadline() {
+  const id = document.getElementById('editDeadlineId').value;
+  const d  = deadlines.find(x => x.id === id);
+  if (!d) return;
+  if (!confirm('Archiviare questa scadenza nello Storico?')) return;
+
+  const hFields = {
+    'Tipo':        d.type,
+    'TipoCustom':  d.tipoCustom || '',
+    'Veicolo':     d.vehicleId ? [d.vehicleId] : [],
+    'Data':        d.date,
+    'Costo':       parseFloat(d.cost) || null,
+    'Note':        d.note || '',
+    'ArchivitoIl': todayStr()
+  };
+
+  showToast('Archiviazione...', 5000);
+  try {
+    await atCreate('Storico', hFields);
+    await atDelete('Scadenze', id);
+    showToast('Archiviata nello storico ✓');
+    closeDeadlineModal();
+    await loadAll();
+  } catch(e) { showToast('Errore: ' + e.message); }
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+const savedSettings = localStorage.getItem('ct_settings');
+if (savedSettings) {
+  try { settings = JSON.parse(savedSettings); } catch(e) {}
+}
+loadAll();
+</script>
+</body>
+</html>
