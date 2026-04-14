@@ -356,7 +356,7 @@ async function loadAll() {
       id:         r.id,
       type:       r.fields['Tipo']       || '',
       tipoCustom: r.fields['TipoCustom'] || '',
-      vehicleId:  r.fields['Veicolo']    ? r.fields['Veicolo'][0] : null,
+      vehicleId:  r.fields['Veicoli']    ? r.fields['Veicoli'][0] : null,
       date:       r.fields['Data']       || '',
       cost:       r.fields['Costo']      || '',
       note:       r.fields['Note']       || ''
@@ -366,7 +366,7 @@ async function loadAll() {
       id:          r.id,
       type:        r.fields['Tipo']        || '',
       tipoCustom:  r.fields['TipoCustom']  || '',
-      vehicleId:   r.fields['Veicolo']     ? r.fields['Veicolo'][0] : null,
+      vehicleId:   r.fields['Veicoli']     ? r.fields['Veicoli'][0] : null,
       date:        r.fields['Data']        || '',
       cost:        r.fields['Costo']       || '',
       note:        r.fields['Note']        || '',
@@ -669,7 +669,7 @@ async function saveDeadline() {
   const fields = {
     'Tipo':       tipo,
     'TipoCustom': tipo === 'Altro' ? document.getElementById('tipoPersonalizzato').value.trim() : '',
-    'Veicolo':    [vehicleId],
+    'Veicoli':    [vehicleId],
     'Data':       date,
     'Costo':      parseFloat(document.getElementById('deadlineCost').value) || null,
     'Note':       document.getElementById('deadlineNote').value.trim()
@@ -698,7 +698,7 @@ async function deleteDeadline() {
   const hFields = {
     'Tipo':        d.type,
     'TipoCustom':  d.tipoCustom || '',
-    'Veicolo':     d.vehicleId ? [d.vehicleId] : [],
+    'Veicoli':     d.vehicleId ? [d.vehicleId] : [],
     'Data':        d.date,
     'Costo':       parseFloat(d.cost) || null,
     'Note':        d.note || '',
